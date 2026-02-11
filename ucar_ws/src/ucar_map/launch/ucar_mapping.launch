@@ -1,0 +1,12 @@
+<launch>
+  <!-- base driver -->
+  <!-- 开启底盘服务 -->
+  <include file="$(find ucar_controller)/launch/base_driver.launch">
+  </include>
+  <!-- lidar driver -->
+  <!-- 开启雷达服务 -->
+  <include file="$(find ydlidar)/launch/ydlidar.launch"/>
+  <!-- cartographer launch -->
+  <!-- 开启构图服务 -->
+  <include file="$(find ucar_map)/launch/gmapping_demo.launch"/>
+</launch>

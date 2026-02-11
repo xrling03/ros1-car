@@ -1,0 +1,60 @@
+<launch>
+
+  <!-- 启动底盘驱动节点，负责控制机器人移动 -->
+  <include file="$(find ucar_controller)/launch/base_driver.launch" > </include>
+
+  <!-- 启动激光雷达驱动，提供环境感知能力 -->
+  <include file="$(find ydlidar)/launch/ydlidar.launch" > </include>
+
+  <!-- 地图服务器节点，加载预定义地图用于导航 -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find ucar_nav)/maps/ucar_map_final.yaml" output="screen">
+    <!-- 设置地图坐标系名称 -->
+    <param name="frame_id" value="map" />
+  </node>
+
+  <!-- 注释掉的全局规划器参数，使用Voronoi图规划算法 -->
+  <!--<param name="base_global_planner" value="voronoi_planner/VoronoiPlanner"/>  -->
+
+  <!-- 启动USB摄像头驱动，用于视觉感知 -->
+  <!-- <include file="$(find usb_cam)/launch/usb_cam-test.launch" > </include> -->
+
+  <!-- 启动AMCL定位节点，基于激光雷达实现自适应蒙特卡洛定位 -->
+  <include file="$(find ucar_nav)/launch/config/amcl/amcl_omni.launch" > </include>
+
+  <!-- 导航核心节点，负责路径规划与执行 -->
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <!-- 设置全局路径规划器为标准全局规划器 -->
+    <param name="base_global_planner" value="global_planner/GlobalPlanner"/>
+    <!-- 设置局部路径规划器为Teb局部规划器 -->
+    <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS"/>
+
+    <!-- 加载全局代价地图配置参数 -->
+    <rosparam file="$(find ucar_nav)/launch/config/move_base/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <!-- 加载局部代价地图配置参数 -->
+    <rosparam file="$(find ucar_nav)/launch/config/move_base/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <!-- 加载全局规划器配置参数 -->
+    <rosparam file="$(find ucar_nav)/launch/config/move_base/global_planner_params.yaml" command="load" />
+    <!-- 加载Teb局部规划器配置参数 -->
+    <rosparam file="$(find ucar_nav)/launch/config/move_base/teb_local_planner_params.yaml" command="load" />
+    <!-- 加载局部代价地图特有配置参数 -->
+    <rosparam file="$(find ucar_nav)/launch/config/move_base/local_costmap_params.yaml" command="load" />
+    <!-- 加载全局代价地图特有配置参数 -->
+    <rosparam file="$(find ucar_nav)/launch/config/move_base/global_costmap_params.yaml" command="load" />
+    <!-- 加载move_base节点特有配置参数 -->
+    <rosparam file="$(find ucar_nav)/launch/config/move_base/move_base_params.yaml" command="load" />
+
+    <!-- 注释掉的导航频率与行为参数 -->
+    <!-- <param name="planner_frequency" value="0"/>
+    <param name="planner_patience" value="0"/>
+    <param name="controller_frequency" value="0.1"/>
+    <param name="controller_patience" value="1.0"/>
+    <param name="clearing_rotation_allowed" value="false"/>-->
+  </node>
+
+  <!-- 注释掉的导航配置加载方式 -->
+  <!-- rosparam command="load" file="$(find ucar_nav)/launch/config/move_base/my_navigation.yaml"/ -->
+
+  <!-- 注释掉的RViz可视化工具启动配置 -->
+  <!--<node pkg="rviz" type="rviz" name="rviz" required="true"
+      args="-d $(find ucar_nav)/launch/config/rviz/tebrviz.rviz"/>-->
+</launch>

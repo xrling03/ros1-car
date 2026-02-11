@@ -1,0 +1,80 @@
+<launch>
+    <!-- 定义激光扫描话题名称参数，默认使用"scan" -->
+    <arg name="scan_topic" default="scan" />
+
+    <!-- 启动gmapping SLAM节点，clear_params确保节点启动时清除命名空间中的旧参数 -->
+    <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen" clear_params="true">
+        <!-- 设置里程计坐标系 -->
+        <param name="odom_frame" value="odom"/>
+
+        <!-- 地图更新间隔时间（秒），减小该值可提高地图更新频率 -->
+        <param name="map_update_interval" value="3.0"/>
+
+        <!-- 激光最大探测范围设置，应略大于实际激光最大有效距离 -->
+        <param name="maxRange" value="8.0"/>
+
+        <!-- 用于建图的有效激光范围，应小于maxRange以过滤噪声 -->
+        <param name="maxUrange" value="7.5"/>
+
+        <!-- 激光测距噪声标准差，较小值使算法更信任激光数据 -->
+        <param name="sigma" value="0.05"/>
+
+        <!-- 扫描匹配核大小，1表示使用单个点 -->
+        <param name="kernelSize" value="1"/>
+
+        <!-- 线性搜索步长（米），小步长提高精度但降低速度 -->
+        <param name="lstep" value="0.05"/>
+
+        <!-- 角度搜索步长（弧度），小步长提高精度但降低速度 -->
+        <param name="astep" value="0.05"/>
+
+        <!-- 扫描匹配迭代次数，增加次数可提高匹配精度 -->
+        <param name="iterations" value="10"/>
+
+        <!-- 扫描匹配时的激光噪声标准差 -->
+        <param name="lsigma" value="0.075"/>
+
+        <!-- 障碍物增益，影响地图中障碍物边界的清晰度 -->
+        <param name="ogain" value="5.0"/>
+
+        <!-- 跳过的激光束数量，0表示使用所有激光点 -->
+        <param name="lskip" value="0"/>
+
+        <!-- 运动模型参数，设置较小值表示更信任里程计数据 -->
+        <param name="srr" value="0.01"/>  <!-- 线性运动的线性不确定性 -->
+        <param name="srt" value="0.02"/>  <!-- 线性运动的角度不确定性 -->
+        <param name="str" value="0.01"/>  <!-- 角度运动的线性不确定性 -->
+        <param name="stt" value="0.02"/>  <!-- 角度运动的角度不确定性 -->
+
+        <!-- 地图更新触发条件：机器人移动或旋转一定量后更新 -->
+        <param name="linearUpdate" value="0.2"/>  <!-- 线性移动距离（米） -->
+        <param name="angularUpdate" value="0.436"/>  <!-- 角度旋转（弧度，约25度） -->
+
+        <!-- 时间更新间隔（秒），-1表示禁用时间触发更新 -->
+        <param name="temporalUpdate" value="-1.0"/>
+
+        <!-- 粒子滤波器重采样阈值，较小值使重采样更频繁 -->
+        <param name="resampleThreshold" value="0.5"/>
+
+        <!-- 粒子数量，增加粒子数提高定位精度但增加计算负担 -->
+        <param name="particles" value="80"/>
+
+        <!-- 初始地图尺寸（米），设置为略大于预期建图区域 -->
+        <param name="xmin" value="-1.0"/>
+        <param name="ymin" value="-1.0"/>
+        <param name="xmax" value="1.0"/>
+        <param name="ymax" value="1.0"/>
+
+        <!-- 地图分辨率（米/像素），5cm分辨率适合5m×5m小范围地图 -->
+        <param name="delta" value="0.01"/>
+
+        <!-- 低级别扫描匹配参数，控制局部优化精度 -->
+        <param name="llsamplerange" value="0.01"/>
+        <param name="llsamplestep" value="0.01"/>
+        <param name="lasamplerange" value="0.005"/>
+        <param name="lasamplestep" value="0.005"/>
+
+        <!-- 重映射激光扫描话题到指定参数 -->
+        <remap from="scan" to="$(arg scan_topic)"/>
+    </node>
+</launch>

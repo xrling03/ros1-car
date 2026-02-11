@@ -1,0 +1,92 @@
+TebLocalPlannerROS:
+  # 基础配置
+  odom_topic: odom              # 里程计话题名称
+  map_frame: /map               # 地图坐标系名称
+
+  # 运动学约束参数 - 加速度限制(单位：m/s² 或 rad/s²)
+  acc_lim_x: 0.2               # 线加速度限制
+  acc_lim_y: 0.05              # y方向最大加速度（m/s²
+  acc_lim_theta: 0.5            # 角加速度限制
+
+  # 速度限制参数(单位：m/s 或 rad/s)
+  max_vel_x: 0.7                # 最大前进速度
+  max_vel_y: 0.5                 # y方向最大线速度（m/s
+  max_vel_x_backwards: 0.2      # 最大后退速度
+  max_vel_theta: 1.5            # 最大角速度
+  
+
+  min_turning_radius: 0.0       # 最小转弯半径(0表示全向移动机器人)
+
+  # 机器人足迹模型配置
+  is_footprint_dynamic: false   # 是否动态更新机器人足迹
+  footprint_model:
+    type: "point"  # 足迹模型类型：point(点)、circular(圆形)、polygon(多边形)
+    vertices: [[0.171, -0.128], [0.171, 0.128],[-0.171, 0.128], [-0.171, -0.128]]  # 多边形顶点坐标(当type为polygon时有效)
+
+  # 目标公差参数(单位：m 或 rad)
+  yaw_goal_tolerance: 0.2       # 朝向误差容忍度
+  xy_goal_tolerance: 0.1        # 位置误差容忍度
+  free_goal_vel: true           # 是否允许目标点处有非零速度
+
+  # 轨迹优化参数
+  teb_autosize: true            # 是否自动调整轨迹长度
+  dt_ref: 0.3                   # 参考时间步长(秒)
+  dt_hysteresis: 0.1            # 时间步长滞后值(防止频繁调整)
+  min_samples: 3                # 最小采样点数
+  global_plan_overwrite_orientation: true   # 是否用全局规划覆盖局部朝向
+  global_plan_viapoint_sep: -0.1            # 路径点分离距离(-1表示自动计算)
+  max_global_plan_lookahead_dist: 2.0       # 全局规划的最大前瞻距离(米)
+  force_reinit_new_goal_dist: 1.0           # 新目标距离超过此值时强制重新初始化
+  feasibility_check_no_poses: 5             # 可行性检查的位姿数量
+  publish_feedback: false                   # 是否发布规划反馈
+  allow_init_with_backwards_motion: false   # 是否允许以倒车方式初始化
+  exact_arc_length: false                   # 是否精确计算弧长
+  shrink_horizon_backup: true               # 无法找到可行轨迹时是否收缩视野
+  shrink_horizon_min_duration: 10.0         # 最小收缩视野持续时间(秒)
+
+  # 障碍物处理参数
+  min_obstacle_dist: 0.10                   # 与障碍物的最小距离(米)
+  include_costmap_obstacles: true           # 是否包含代价地图中的障碍物
+  costmap_obstacles_behind_robot_dist: 1.0  # 机器人后方障碍物的考虑距离(米)
+  inflation_dist: 0.5                       # 障碍物膨胀距离(米)
+  include_dynamic_obstacles: false          # 是否包含动态障碍物
+  legacy_obstacle_association: false        # 是否使用旧版障碍物关联算法
+  obstacle_association_force_inclusion_factor: 1.5  # 强制包含障碍物的因子
+  obstacle_association_cutoff_factor: 5     # 障碍物关联的截止因子
+  costmap_converter_plugin: ""              # 代价地图转换器插件名称
+  costmap_converter_spin_thread: true       # 是否在单独线程中运行代价地图转换器
+  costmap_converter_rate: 10.0              # 代价地图转换频率(Hz)
+
+  # 优化器参数
+  no_inner_iterations: 5                    # 内层优化迭代次数
+  no_outer_iterations: 4                    # 外层优化迭代次数
+  penalty_epsilon: 0.1                      # 约束违反的惩罚参数
+  weight_acc_lim_x: 1.0                     # 线加速度约束权重
+  weight_acc_lim_theta: 1.0                 # 角加速度约束权重
+  weight_max_vel_x: 2.0                     # 线速度约束权重
+  weight_max_vel_theta: 1.0                 # 角速度约束权重
+  weight_kinematics_nh: 1100.0              # 非完整约束权重(用于差分驱动机器人)
+  weight_kinematics_forward_drive: 1000.0   # 前向驱动约束权重
+  weight_kinematics_turning_radius: 1.5     # 转弯半径约束权重
+  weight_optimaltime: 1.5                   # 优化时间权重(越小越优先考虑时间)
+  weight_obstacle: 30.0                     # 障碍物避障权重
+  weight_viapoint: 1.0                      # 路径点跟踪权重
+  weight_inflation: 0.1                     # 障碍物膨胀区域权重
+  weight_adapt_factor: 2.0                  # 自适应权重因子
+
+  # 同伦类规划参数(用于多路径选择)
+  enable_homotopy_class_planning: false     # 是否启用同伦类规划
+  enable_multithreading: true               # 是否启用多线程
+  max_number_classes: 2                     # 最大同伦类数量
+  selection_cost_hysteresis: 1.0            # 路径选择代价滞后因子
+  selection_obst_cost_scale: 100.0          # 障碍物代价缩放因子
+  selection_viapoint_cost_scale: 1.0        # 路径点代价缩放因子
+  selection_alternative_time_cost: false    # 是否考虑替代路径的时间代价
+  roadmap_graph_no_samples: 15              # 路线图采样点数量
+  roadmap_graph_area_width: 5               # 路线图采样区域宽度
+  h_signature_prescaler: 1.0                # 同伦签名预缩放因子
+  h_signature_threshold: 0.1                # 同伦签名阈值
+  obstacle_heading_threshold: 0.45          # 障碍物朝向阈值
+  visualize_hc_graph: false                 # 是否可视化同伦类图
+  viapoints_all_candidates: true            # 是否考虑所有候选路径点
+  switching_blocking_period: 0.0            # 路径切换阻塞周期(秒)

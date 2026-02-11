@@ -1,0 +1,73 @@
+<launch>
+  <!-- 启动自适应蒙特卡洛定位(AMCL)节点，实现机器人在已知地图中的位姿估计 -->
+  <node pkg="amcl" type="amcl" name="amcl">
+    <!-- 从最佳位姿发布扫描数据，最大频率10Hz -->
+    <param name="odom_model_type" value="omni"/>      <!-- 里程计模型类型，omni适用于全向移动机器人 -->
+    <param name="odom_alpha5" value="0.1"/>           <!-- 里程计噪声参数，旋转引起的旋转噪声 -->
+    <param name="transform_tolerance" value="0.2" />  <!-- TF变换缓存时间，单位秒 -->
+    <param name="gui_publish_rate" value="10.0"/>     <!-- GUI可视化发布频率，单位Hz -->
+    <param name="laser_max_beams" value="50"/>        <!-- 每次扫描使用的最大激光束数量，减少计算量 -->
+
+    <!-- 地图使用方式配置 -->
+    <!-- <param name="use_map_topic" value="true"/> -->
+    <param name="use_map_topic" value="false"/>
+    <!-- //当设置为true时，AMCL将会订阅map话题，而不是调用服务返回地图。
+         //也就是说，当设置为true时，有另外一个节点实时的发布map话题，
+         //也就是机器人在实时的进行地图构建，并供给amcl话题使用；
+         //当设置为false时，通过map server，也就是调用已经构建完成的地图。
+         //在navigation 1.4.2中新加入的参数。 -->
+
+    <param name="first_map_only" value="true"/>
+    <!-- <param name="first_map_only" value="false"/> -->
+    <!-- //当设置为true时，AMCL将仅仅使用订阅的第一个地图，而不是每次接收到新的时更新为一个新的地图，
+         //在navigation 1.4.2中新加入的参数。 -->
+
+    <!-- 粒子滤波器参数配置 -->
+    <param name="min_particles" value="1000"/>        <!-- 最小粒子数 -->
+    <param name="max_particles" value="10000"/>       <!-- 最大粒子数 -->
+    <param name="kld_err" value="0.05"/>              <!-- KLD采样误差容限 -->
+    <param name="kld_z" value="0.99"/>                <!-- KLD置信度参数 -->
+
+    <!-- 里程计噪声参数，控制粒子扩散速度 -->
+    <param name="odom_alpha1" value="0.2"/>           <!-- 旋转引起的旋转噪声 -->
+    <param name="odom_alpha2" value="0.2"/>           <!-- 平移引起的旋转噪声 -->
+    <param name="odom_alpha3" value="0.8"/>           <!-- 平移引起的平移噪声 -->
+    <param name="odom_alpha4" value="0.2"/>           <!-- 旋转引起的平移噪声 -->
+
+    <!-- 激光雷达观测模型参数 -->
+    <param name="laser_z_hit" value="0.5"/>           <!-- 激光击中物体的概率权重 -->
+    <param name="laser_z_short" value="0.05"/>        <!-- 激光短反射的概率权重 -->
+    <param name="laser_z_max" value="0.05"/>          <!-- 激光最大值测量的概率权重 -->
+    <param name="laser_z_rand" value="0.5"/>          <!-- 激光随机测量的概率权重 -->
+    <param name="laser_sigma_hit" value="0.2"/>       <!-- 击中模型的标准差 -->
+    <param name="laser_lambda_short" value="0.1"/>    <!-- 短反射模型的指数衰减率 -->
+
+    <!-- 激光模型类型配置 -->
+    <!-- <param name="laser_model_type" value="likelihood_field"/> -->
+    <param name="laser_model_type" value="beam"/>     <!-- 使用光束模型进行激光扫描匹配 -->
+    <param name="laser_likelihood_max_dist" value="2.0"/> <!-- 似然场模型的最大距离 -->
+
+    <!-- 更新频率控制 -->
+    <param name="update_min_d" value="0.2"/>          <!-- 位置更新的最小距离阈值 -->
+    <param name="update_min_a" value="0.5"/>          <!-- 角度更新的最小角度阈值 -->
+
+    <!-- 坐标系配置 -->
+    <param name="odom_frame_id" value="odom"/>        <!-- 里程计坐标系名称 -->
+    <param name="resample_interval" value="1"/>       <!-- 重采样间隔 -->
+    <param name="transform_tolerance" value="0.1"/>   <!-- TF变换容差 -->
+
+    <!-- 异常恢复参数 -->
+    <param name="recovery_alpha_slow" value="0.0"/>   <!-- 慢速恢复因子 -->
+    <param name="recovery_alpha_fast" value="0.0"/>   <!-- 快速恢复因子 -->
+
+    <!-- 注释掉的坐标系配置参数 -->
+    <!-- <param name="odom_frame_id" value="odom"/>   -->
+    <!-- //里程计默认使用的坐标系 -->
+    <!-- <param name="base_frame_id" value="base_link"/>   -->
+    <!-- //用作机器人的基坐标系 -->
+    <!-- <param name="global_frame_id" value="map"/>   -->
+    <!-- //由定位系统发布的坐标系名称 -->
+    <!-- <param name="tf_broadcast" value="false"/>   -->
+    <!-- //设置为false阻止amcl发布全局坐标系和里程计坐标系之间的tf变换 -->
+  </node>
+</launch>
